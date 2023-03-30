@@ -2514,6 +2514,11 @@ function pfUI.uf:GetStatusValue(unit, pos)
 end
 
 function pfUI.uf.GetColor(self, preset)
+  if C.unitframes.customtext == "1" then
+    r, g, b = pfUI.api.strsplit(",", C.unitframes.customtextcolor)
+    return rgbhex(r,g,b)
+  end
+
   local config = self.config
 
   local unitstr = self.label .. self.id

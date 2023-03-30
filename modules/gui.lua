@@ -1621,6 +1621,8 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
       CreateConfig(nil, T["Rage Color"], C.unitframes, "ragecolor", "color")
       CreateConfig(nil, T["Energy Color"], C.unitframes, "energycolor", "color")
       CreateConfig(nil, T["Focus Color"], C.unitframes, "focuscolor", "color")
+      CreateConfig(nil, T["Enable Custom Bar Text Color"], C.unitframes, "customtext", "checkbox")
+      CreateConfig(nil, T["Custom Bar Text Color"], C.unitframes, "customtextcolor", "color")
     end)
 
     -- Shared Unit- and Groupframes

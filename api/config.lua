@@ -201,6 +201,8 @@ function pfUI:LoadConfig()
   pfUI:UpdateConfig("unitframes", nil,           "energycolor",      "1,1,.5,1")
   pfUI:UpdateConfig("unitframes", nil,           "ragecolor",        "1,.5,.5,1")
   pfUI:UpdateConfig("unitframes", nil,           "focuscolor",       "1,1,.75,1")
+  pfUI:UpdateConfig("unitframes", nil,           "customtext",       "0")
+  pfUI:UpdateConfig("unitframes", nil,           "customtextcolor",  "1,1,1,1")
 
   pfUI:UpdateConfig("unitframes", nil,           "animation_speed",  "5")
   pfUI:UpdateConfig("unitframes", nil,           "portraitalpha",    "0.1")

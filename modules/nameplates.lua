@@ -17,6 +17,10 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
   local registry = {}
   local debuffdurations = C.appearance.cd.debuffs == "1" and true or nil
 
+  -- stores last shown name plates
+  local visibleplates = {}
+  local forcehideplates = nil
+
   -- cache default border color
   local er, eg, eb, ea = GetStringColor(pfUI_config.appearance.border.color)
 
@@ -78,9 +82,14 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
   end
 
   local function HidePlate(unittype, name, fullhp, target)
+    if C.nameplates.target == "1" and target then return nil end
+
+    if forcehideplates then
+      return true
+    end
+
     -- keep some plates always visible according to config
     if C.nameplates.fullhealth == "1" and not fullhp then return nil end
-    if C.nameplates.target == "1" and target then return nil end
 
     -- return true when something needs to be hidden
     if C.nameplates.enemynpc == "1" and unittype == "ENEMY_NPC" then
@@ -105,6 +114,22 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
 
     -- nothing to hide
     return nil
+  end
+
+  local function CheckHealthbarCountLimit()
+    -- check count of healthbar on the screen and force hide the bars to prevent performance lags
+    local limit = tonumber(C.nameplates.limithealth)
+    local threshold = forcehideplates and limit * 0.2 or 0
+    local count = 0
+
+    for nameplate in pairs(visibleplates) do
+      if nameplate:IsVisible() then
+        count = count + 1
+      else
+        visibleplates[nameplate] = nil
+      end
+    end
+    forcehideplates = count + threshold > limit
   end
 
   local function GetUnitType(red, green, blue)
@@ -543,8 +568,13 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     elite = plate.original.levelicon:IsShown() and not player and "boss" or elite
     if not class then plate.wait_for_scan = true end
 
-    -- skip data updates on invisible frames
-    if not visible then return end
+    if visible then
+      visibleplates[plate] = true
+    else
+      visibleplates[plate] = nil
+      -- skip data updates on invisible frames
+      return
+    end
 
     -- target event sometimes fires too quickly, where nameplate identifiers are not
     -- yet updated. So while being inside this event, we cannot trust the unitstr.
@@ -755,6 +785,8 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
   end
 
   nameplates.OnShow = function(frame)
+    CheckHealthbarCountLimit()
+
     local frame = frame or this
     local nameplate = frame.nameplate
 

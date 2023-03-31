@@ -79,6 +79,21 @@ function pfUI.api.RunOOC(func)
   end
 end
 
+
+function pfUI.api.DebugPrint(c, a1,a2,a3,a4,a5,a6,a7)
+  -- description = debugstack([thread, ][start[, count1[, count2]]]])
+  if not c then
+    return
+  end
+
+  local args = {a1,a2,a3,a4,a5,a6,a7}
+  local msg = ""
+  for i, arg in pairs(args) do
+    msg = msg .. "[" .. tostring(i) .. ":" .. tostring(arg == nil and "nil" or arg) .. "]"
+  end
+  print(msg)
+end
+
 -- [ UnitHasBuff ]
 -- Returns whether a unit has the given buff or not.
 -- unit         [string]        A unit to query (string, unitID)

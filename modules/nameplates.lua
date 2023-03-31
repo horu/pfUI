@@ -126,6 +126,16 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
       if nameplate:IsVisible() then
         count = count + 1
       else
+        --DebugPrint(
+        --        nameplate.original.name:GetText() == "Docks Crier",
+        --        "REMOVE",
+        --        nameplate.original.name:GetText(),
+        --        (nameplate.distance and nameplate.distance.value or 99),
+        --        (nameplate.distance and nameplate.distance.change_time or 99),
+        --        (nameplate.distance and nameplate.distance.start_value or 99),
+        --        " "
+        --)
+        nameplate.distance = nil
         visibleplates[nameplate] = nil
       end
     end
@@ -134,15 +144,15 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
 
   local function GetUnitType(red, green, blue)
     if red > .9 and green < .2 and blue < .2 then
-      return "ENEMY_NPC", false
+      return "ENEMY_NPC", MOB_TYPE
     elseif red > .9 and green > .9 and blue < .2 then
-      return "NEUTRAL_NPC", false
+      return "NEUTRAL_NPC", MOB_TYPE
     elseif red < .2 and green < .2 and blue > 0.9 then
-      return "FRIENDLY_PLAYER", true
+      return "FRIENDLY_PLAYER", PLAYER_TYPE
     elseif red < .2 and green > .9 and blue < .2 then
-      return "FRIENDLY_NPC", true
+      return "FRIENDLY_NPC", MOB_TYPE
     end
-    return "ENEMY_NPC", false
+    return "ENEMY_NPC", MOB_TYPE
   end
 
   local filter, list, cache
@@ -439,6 +449,62 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     nameplates.OnShow(parent)
   end
 
+  nameplates.CalculateOffset = function(nameplate, current_offset)
+    local offset_shift = 15
+    local required_offset = tonumber(C.nameplates.health.offset)
+    if not nameplate.distance then
+      return required_offset + offset_shift * 2
+    elseif nameplate.distance.value == DISTANCE_OVER_10 then
+      required_offset = required_offset + offset_shift
+    elseif nameplate.distance.value == DISTANCE_OVER_30 then
+      required_offset = required_offset + offset_shift * 2
+    end
+
+    if not nameplate.distance.change_time then
+      return required_offset
+    end
+
+    local timeout_limit = 1
+    local timeout = GetTime() - nameplate.distance.change_time
+    if timeout >= timeout_limit then
+      nameplate.distance.change_time = nil
+      return required_offset
+    end
+
+    if not nameplate.distance.start_value then
+      nameplate.distance.start_value = current_offset
+    end
+    local offset = nameplate.distance.start_value + (required_offset - nameplate.distance.start_value) * timeout / timeout_limit
+
+    return offset
+  end
+
+  nameplates.UpdateOffset = function(nameplate)
+    local _, _, _, _, current_offset = nameplate.name:GetPoint()
+    local offset = nameplates.CalculateOffset(nameplate, current_offset)
+    if math.abs(current_offset - offset) <= 0.1 then
+      return
+    end
+
+    -- DebugPrint(1, nameplate.original.name:GetText(), current_offset, offset)
+
+    local _, default_border = GetBorderSize("nameplates")
+    local combo_size = 5
+
+    nameplate.name:SetPoint("TOP", nameplate, "TOP", 0, offset)
+
+    nameplate.health:SetPoint("TOP", nameplate.name, "BOTTOM", 0, -3)
+    nameplate.raidicon:SetPoint(C.nameplates.raidiconpos, nameplate.health, C.nameplates.raidiconpos, C.nameplates.raidiconoffx, C.nameplates.raidiconoffy)
+    for i=1,5 do
+      nameplate.combopoints[i]:SetPoint("TOPRIGHT", nameplate.health, "BOTTOMRIGHT", -(i-1)*(combo_size+default_border*3), -default_border*3)
+    end
+
+    nameplate.castbar:SetPoint("TOPLEFT", nameplate.health, "BOTTOMLEFT", 0, -default_border*3)
+    nameplate.castbar:SetPoint("TOPRIGHT", nameplate.health, "BOTTOMRIGHT", 0, -default_border*3)
+    nameplate.castbar.icon:SetPoint("BOTTOMLEFT", nameplate.castbar, "BOTTOMRIGHT", default_border*3, 0)
+    nameplate.castbar.icon:SetPoint("TOPLEFT", nameplate.health, "TOPRIGHT", default_border*3, 0)
+  end
+
   nameplates.OnConfigChange = function(frame)
     local parent = frame
     local nameplate = frame.nameplate
@@ -466,7 +532,6 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
 
     nameplate.name:SetFont(font, font_size, font_style)
 
-    nameplate.health:SetPoint("TOP", nameplate.name, "BOTTOM", 0, healthoffset)
     nameplate.health:SetStatusBarTexture(hptexture)
     nameplate.health:SetWidth(C.nameplates.width)
     nameplate.health:SetHeight(C.nameplates.heighthealth)
@@ -483,7 +548,6 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     nameplate.glow:SetVertexColor(glowr, glowg, glowb, glowa)
 
     nameplate.raidicon:ClearAllPoints()
-    nameplate.raidicon:SetPoint(C.nameplates.raidiconpos, nameplate.health, C.nameplates.raidiconpos, C.nameplates.raidiconoffx, C.nameplates.raidiconoffy)
     nameplate.level:SetFont(font, font_size, font_style)
     nameplate.raidicon:SetWidth(C.nameplates.raidiconsize)
     nameplate.raidicon:SetHeight(C.nameplates.raidiconsize)
@@ -495,12 +559,9 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     for i=1,5 do
       nameplate.combopoints[i]:SetWidth(combo_size)
       nameplate.combopoints[i]:SetHeight(combo_size)
-      nameplate.combopoints[i]:SetPoint("TOPRIGHT", nameplate.health, "BOTTOMRIGHT", -(i-1)*(combo_size+default_border*3), -default_border*3)
       CreateBackdrop(nameplate.combopoints[i], default_border)
     end
 
-    nameplate.castbar:SetPoint("TOPLEFT", nameplate.health, "BOTTOMLEFT", 0, -default_border*3)
-    nameplate.castbar:SetPoint("TOPRIGHT", nameplate.health, "BOTTOMRIGHT", 0, -default_border*3)
     nameplate.castbar:SetHeight(C.nameplates.heightcast)
     nameplate.castbar:SetStatusBarTexture(pfUI.media["img:bar"])
     nameplate.castbar:SetStatusBarColor(.9,.8,0,1)
@@ -508,8 +569,6 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
 
     nameplate.castbar.text:SetFont(font, font_size, "OUTLINE")
     nameplate.castbar.spell:SetFont(font, font_size, "OUTLINE")
-    nameplate.castbar.icon:SetPoint("BOTTOMLEFT", nameplate.castbar, "BOTTOMRIGHT", default_border*3, 0)
-    nameplate.castbar.icon:SetPoint("TOPLEFT", nameplate.health, "TOPRIGHT", default_border*3, 0)
     nameplate.castbar.icon:SetWidth(C.nameplates.heightcast + default_border*3 + C.nameplates.heighthealth)
     CreateBackdrop(nameplate.castbar.icon, default_border)
 
@@ -535,9 +594,25 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     local mouseover = UnitExists("mouseover") and plate.original.glow:IsShown() or nil
     local unitstr = target and "target" or mouseover and "mouseover" or nil
     local red, green, blue = plate.original.healthbar:GetStatusBarColor()
-    local unittype, status_bar_player = GetUnitType(red, green, blue)
-    local class, ulevel, elite, player, guild, npcinfo = GetUnitData(name, true, status_bar_player)
+    local unittype, unit_type = GetUnitType(red, green, blue)
     local font_size = C.nameplates.use_unitfonts == "1" and C.global.font_unit_size or C.global.font_size
+
+    local unit_to_find = PfUnit:New()
+    unit_to_find.name = name
+    unit_to_find.type = unit_type
+    if level ~= "??" then
+      unit_to_find.level = level
+    end
+    unit_to_find.hp_max = hpmax
+    local unit = FindPfUnit(unit_to_find, true)
+    local class = unit and unit.class or nil
+    local ulevel = unit and unit.level or nil
+    local elite = unit and unit.elite or nil
+    local player = unit and unit.type == PLAYER_TYPE or nil
+    local guild = unit and unit.guild or nil
+    local distance = unit and unit.distance or nil
+    local npcinfo = unit and unit.npc_info or nil
+
 
     local additionalinfo = nil
     if guild and C.nameplates.showguildname == "1" then
@@ -548,6 +623,18 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
 
     -- ignore players with npc names if plate level is lower than player level
     if ulevel and ulevel > (level == "??" and -1 or level) then player = nil end
+
+    if distance and (GetTime() - distance.change_time <= 1) then
+      if not plate.distance then
+        plate.distance = {}
+        plate.distance.value = distance.value
+      elseif plate.distance.value ~= distance.value then
+        plate.distance = {}
+        plate.distance.value = distance.value
+        plate.distance.change_time = distance.change_time
+        plate.distance.start_value = nil
+      end
+    end
 
     -- cache name and reset unittype on change
     if plate.cache.name ~= name then
@@ -627,7 +714,8 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     elseif HidePlate(unittype, name, (hpmax-hp == hpmin), target) then
       plate.level:SetPoint("RIGHT", plate.name, "LEFT", -3, 0)
       plate.name:SetParent(plate)
-      plate.additionalinfo:SetPoint("BOTTOM", plate.name, "BOTTOM", -2, -(font_size + 2))
+      -- plate.additionalinfo:SetPoint("BOTTOM", plate.name, "BOTTOM", -2, -(font_size + 2))
+      plate.additionalinfo:SetPoint("BOTTOM", plate.health, "BOTTOM", 0, -(font_size + 4))
 
       plate.level:Show()
       plate.name:Show()
@@ -802,6 +890,10 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     local target = UnitExists("target") and frame:GetAlpha() == 1 or nil
     local mouseover = UnitExists("mouseover") and original.glow:IsShown() or nil
 
+    if nameplate:IsVisible() then
+      nameplates.UpdateOffset(nameplate)
+    end
+
     -- trigger queued event update
     if nameplate.eventcache then
       nameplates:OnDataChanged(nameplate)
@@ -838,7 +930,7 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     end
 
     -- trigger update when unit was found
-    if nameplate.wait_for_scan and GetUnitData(name, true) then
+    if nameplate.wait_for_scan and FindPfUnit({ name = name }, true) then
       nameplate.wait_for_scan = nil
       update = true
     end

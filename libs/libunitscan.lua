@@ -23,6 +23,7 @@ setfenv(1, pfUI:GetEnvironment())
 --     elite[String] - The elite state of the unit (See UnitClassification())
 --     player[Boolean] - Returns true if unit is a player
 --     guild[String] - Returns guild name of unit is a player
+--     npcinfo[String] - Returns additional npc info is a npc (Trainer, Merchant and other)
 --
 -- Internal functions:
 --   libunitscan:AddData(db, name, class, level, elite)
@@ -34,6 +35,7 @@ if pfUI.api.libunitscan then return end
 
 local units = { players = {}, mobs = {} }
 local queue = { }
+local npcscanner = libtipscan:GetScanner("libunitscan")
 
 function GetUnitData(name, active, explicitplayer)
   local checkarray = {
@@ -49,7 +51,7 @@ function GetUnitData(name, active, explicitplayer)
   for _, check in pairs(checkarray) do
     local ret = units[check.db][name]
     if ret then
-      return ret.class, ret.level, ret.elite, check.player, ret.guild
+      return ret.class, ret.level, ret.elite, check.player, ret.guild, ret.npcinfo
     end
   end
 
@@ -59,7 +61,7 @@ function GetUnitData(name, active, explicitplayer)
   end
 end
 
-local function AddData(db, name, class, level, elite, guild)
+local function AddData(db, name, class, level, elite, guild, npcinfo)
   if not name or not db then return end
   units[db] = units[db] or {}
   units[db][name] = units[db][name] or {}
@@ -67,7 +69,29 @@ local function AddData(db, name, class, level, elite, guild)
   units[db][name].level = level or units[db][name].level
   units[db][name].elite = elite or units[db][name].elite
   units[db][name].guild = guild or units[db][name].guild
+  units[db][name].npcinfo = npcinfo or units[db][name].npcinfo
   queue[name] = nil
+end
+
+local function GetNpcInfo(unit)
+  if UnitPlayerControlled(unit) then
+    -- exclude player pets
+    return nil
+  end
+
+  npcscanner:SetUnit(unit)
+  info = npcscanner:Line(2)
+
+  if type(info) == "table" then
+    info = table.unpack(info)
+  end
+
+  if info and string.find(info, "Level") then
+    -- exclude poor npc information
+    return nil
+  end
+
+  return info
 end
 
 local libunitscan = CreateFrame("Frame", "pfUnitScan", UIParent)
@@ -153,7 +177,8 @@ libunitscan:SetScript("OnEvent", function()
       elite = UnitClassification(scan)
       level = UnitLevel(scan)
       name = UnitName(scan)
-      AddData("mobs", name, class, level, elite)
+      npcinfo = GetNpcInfo(scan)
+      AddData("mobs", name, class, level, elite, nil, npcinfo)
     end
   end
 end)

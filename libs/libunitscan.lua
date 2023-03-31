@@ -10,10 +10,13 @@ setfenv(1, pfUI:GetEnvironment())
 -- on further expansions.
 --
 -- External functions:
---   GetUnitData(name, active)
+--   GetUnitData(name, active, explicitplayer)
 --     Returns information of the given unitname. Returns nil if no match is found.
 --     When nothing is found and the active flag is set, the autoscanner will
 --     automatically pick it up and try to fill the missing entry by targetting the unit.
+--     explicitplayer defines the order to search unit by name:
+--       true or nil - search unit in player db first
+--       false - search unit in mobs db first.
 --
 --     class[String] - The class of the unit
 --     level[Number] - The level of the unit
@@ -31,14 +34,25 @@ if pfUI.api.libunitscan then return end
 local units = { players = {}, mobs = {} }
 local queue = { }
 
-function GetUnitData(name, active)
-  if units["players"][name] then
-    local ret = units["players"][name]
-    return ret.class, ret.level, ret.elite, true
-  elseif units["mobs"][name] then
-    local ret = units["mobs"][name]
-    return ret.class, ret.level, ret.elite, nil
-  elseif active then
+function GetUnitData(name, active, explicitplayer)
+  local checkarray = {
+    { db = "players", player = true},
+    { db = "mobs", player = nil},
+  }
+  if explicitplayer == false then
+    local first = checkarray[1]
+    checkarray[1] = checkarray[2]
+    checkarray[2] = first
+  end
+
+  for _, check in pairs(checkarray) do
+    local ret = units[check.db][name]
+    if ret then
+      return ret.class, ret.level, ret.elite, check.player
+    end
+  end
+
+  if active then
     queue[name] = true
     libunitscan:Show()
   end

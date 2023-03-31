@@ -96,14 +96,15 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
 
   local function GetUnitType(red, green, blue)
     if red > .9 and green < .2 and blue < .2 then
-      return "ENEMY_NPC"
+      return "ENEMY_NPC", false
     elseif red > .9 and green > .9 and blue < .2 then
-      return "NEUTRAL_NPC"
+      return "NEUTRAL_NPC", false
     elseif red < .2 and green < .2 and blue > 0.9 then
-      return "FRIENDLY_PLAYER"
+      return "FRIENDLY_PLAYER", true
     elseif red < .2 and green > .9 and blue < .2 then
-      return "FRIENDLY_NPC"
+      return "FRIENDLY_NPC", true
     end
+    return "ENEMY_NPC", false
   end
 
   local filter, list, cache
@@ -486,12 +487,12 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     local hpmin, hpmax = plate.original.healthbar:GetMinMaxValues()
     local name = plate.original.name:GetText()
     local level = plate.original.level:IsShown() and plate.original.level:GetObjectType() == "FontString" and tonumber(plate.original.level:GetText()) or "??"
-    local class, ulevel, elite, player = GetUnitData(name, true)
     local target = plate.istarget
     local mouseover = UnitExists("mouseover") and plate.original.glow:IsShown() or nil
     local unitstr = target and "target" or mouseover and "mouseover" or nil
     local red, green, blue = plate.original.healthbar:GetStatusBarColor()
-    local unittype = GetUnitType(red, green, blue) or "ENEMY_NPC"
+    local unittype, status_bar_player = GetUnitType(red, green, blue)
+    local class, ulevel, elite, player = GetUnitData(name, true, status_bar_player)
 
     -- ignore players with npc names if plate level is lower than player level
     if ulevel and ulevel > (level == "??" and -1 or level) then player = nil end

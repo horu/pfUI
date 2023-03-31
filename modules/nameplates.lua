@@ -2,14 +2,6 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
   -- disable original castbars
   pcall(SetCVar, "ShowVKeyCastbar", 0)
 
-  local unitcolors = {
-    ["ENEMY_NPC"] = { .9, .2, .3, .8 },
-    ["NEUTRAL_NPC"] = { 1, 1, .3, .8 },
-    ["FRIENDLY_NPC"] = { .6, 1, 0, .8 },
-    ["ENEMY_PLAYER"] = { .9, .2, .3, .8 },
-    ["FRIENDLY_PLAYER"] = { .2, .6, 1, .8 }
-  }
-
   local elitestrings = {
     ["elite"] = "+",
     ["rareelite"] = "R+",
@@ -27,6 +19,27 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
 
   -- cache default border color
   local er, eg, eb, ea = GetStringColor(pfUI_config.appearance.border.color)
+
+  local function GetUnitColor(unittype, unitname)
+    local unitcolors = {
+      ["ENEMY_NPC"] = { .9, .2, .3, .8 },
+      ["NEUTRAL_NPC"] = { 1, 1, .3, .8 },
+      ["FRIENDLY_NPC"] = { .6, 1, 0, .8 },
+      ["ENEMY_PLAYER"] = { .9, .2, .3, .8 },
+      ["FRIENDLY_PLAYER"] = { .2, .6, 1, .8 }
+    }
+
+    if unittype == "FRIENDLY_PLAYER" and UnitInParty("player") then
+      for i = 1, GetNumPartyMembers() do
+        partyunit = "party" .. i
+        if UnitName(partyunit) == unitname then
+          -- green color for party member
+          return { 0, .8, 0, .8 }
+        end
+      end
+    end
+    return unitcolors[unittype]
+  end
 
   local function IsNamePlate(frame)
     if frame:GetObjectType() ~= NAMEPLATE_FRAMETYPE then return nil end
@@ -650,7 +663,7 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
       plate.health.text:SetText()
     end
 
-    local r, g, b, a = unpack(unitcolors[unittype])
+    local r, g, b, a = unpack(GetUnitColor(unittype, name))
 
     if unittype == "ENEMY_PLAYER" and C.nameplates["enemyclassc"] == "1" and class and RAID_CLASS_COLORS[class] then
       r, g, b, a = RAID_CLASS_COLORS[class].r, RAID_CLASS_COLORS[class].g, RAID_CLASS_COLORS[class].b, 1

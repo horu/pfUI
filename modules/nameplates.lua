@@ -416,6 +416,7 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     local plate_height_cast = C.nameplates.heighthealth + font_size + 5 + C.nameplates.heightcast + 5
     local combo_size = 5
 
+    local plateoffset = tonumber(C.nameplates.offset)
     local width = tonumber(C.nameplates.width)
     local debuffsize = tonumber(C.nameplates.debuffsize)
     local healthoffset = tonumber(C.nameplates.health.offset)
@@ -425,6 +426,7 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     nameplate:SetPoint("TOP", parent, "TOP", 0, 0)
 
     nameplate.name:SetFont(font, font_size, font_style)
+    nameplate.name:SetPoint("TOP", nameplate, "TOP", 0, plateoffset)
 
     nameplate.health:SetPoint("TOP", nameplate.name, "BOTTOM", 0, healthoffset)
     nameplate.health:SetStatusBarTexture(hptexture)

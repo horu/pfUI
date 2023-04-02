@@ -2334,6 +2334,8 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
       CreateConfig(U["nameplates"], T["Replace Totems With Icons"], C.nameplates, "totemicons", "checkbox")
       CreateConfig(U["nameplates"], T["Show Guild Name"], C.nameplates, "showguildname", "checkbox")
       CreateConfig(U["nameplates"], T["Nameplate Vertical Offset"], C.nameplates, "offset")
+      CreateConfig(U["nameplates"], T["Show Additional Npc Info(Trainers and etc.)"], C.nameplates, "shownpcinfo", "checkbox")
+      CreateConfig(U["nameplates"], T["Additional Npc Info/Guild Name Offset"], C.nameplates, "additionaloffset")
 
       CreateConfig(nil, T["Raid Icon"], nil, nil, "header")
       CreateConfig(U["nameplates"], T["Raid Icon Position"], C.nameplates, "raidiconpos", "dropdown", pfUI.gui.dropdowns.positions)

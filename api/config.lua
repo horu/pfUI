@@ -703,6 +703,8 @@ function pfUI:LoadConfig()
   pfUI:UpdateConfig("nameplates", nil,           "totemicons",       "0")
   pfUI:UpdateConfig("nameplates", nil,           "showguildname",    "0")
   pfUI:UpdateConfig("nameplates", nil,           "offset",           "0")
+  pfUI:UpdateConfig("nameplates", nil,           "shownpcinfo",      "0")
+  pfUI:UpdateConfig("nameplates", nil,           "additionaloffset", "0")
 
   pfUI:UpdateConfig("nameplates", nil,           "outfriendly",      "0")
   pfUI:UpdateConfig("nameplates", nil,           "outfriendlynpc",   "1")

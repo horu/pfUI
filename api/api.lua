@@ -1316,7 +1316,7 @@ function pfUI.api.GetNoNameObject(frame, objtype, layer, arg1, arg2)
 end
 
 function pfUI.api.ToString(value, depth, itlimit, short)
-  depth = depth or 1
+  depth = depth or 3
   itlimit = itlimit or 50
   if type(value) == 'table' then
     local str = '{'

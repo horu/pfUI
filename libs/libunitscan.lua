@@ -20,6 +20,7 @@ setfenv(1, pfUI:GetEnvironment())
 --     elite[String] - The elite state of the unit (See UnitClassification())
 --     player[Boolean] - Returns true if unit is a player
 --     guild[String] - Returns guild name of unit is a player
+--     npcinfo[String] - Returns additional npc info is a npc (Trainer, Merchant and other)
 --
 -- Internal functions:
 --   libunitscan:AddData(db, name, class, level, elite)
@@ -31,21 +32,37 @@ if pfUI.api.libunitscan then return end
 
 local units = { players = {}, mobs = {} }
 local queue = { }
+local npcscanner = libtipscan:GetScanner("libunitscan")
+
+-- To remove faction names from npc info
+local useless_npcinfo_list = {
+  "s Pet",
+  "s Minion",
+  "Level",
+}
+
+local factionlist = { }
+local function UpdateFactionList()
+  for factionIndex = 1, GetNumFactions() do
+    name = GetFactionInfo(factionIndex)
+    factionlist[name] = true
+  end
+end
 
 function GetUnitData(name, active)
   if units["players"][name] then
     local ret = units["players"][name]
-    return ret.class, ret.level, ret.elite, true, ret.guild
+    return ret.class, ret.level, ret.elite, true, ret.guild, nil
   elseif units["mobs"][name] then
     local ret = units["mobs"][name]
-    return ret.class, ret.level, ret.elite, nil, nil
+    return ret.class, ret.level, ret.elite, nil, nil, ret.npcinfo
   elseif active then
     queue[name] = true
     libunitscan:Show()
   end
 end
 
-local function AddData(db, name, class, level, elite, guild)
+local function AddData(db, name, class, level, elite, guild, npcinfo)
   if not name or not db then return end
   units[db] = units[db] or {}
   units[db][name] = units[db][name] or {}
@@ -53,7 +70,39 @@ local function AddData(db, name, class, level, elite, guild)
   units[db][name].level = level or units[db][name].level
   units[db][name].elite = elite or units[db][name].elite
   units[db][name].guild = guild or units[db][name].guild
+  units[db][name].npcinfo = npcinfo or units[db][name].npcinfo
   queue[name] = nil
+end
+
+local function GetNpcInfo(unit)
+  if UnitPlayerControlled(unit) then
+    -- exclude player pets
+    return
+  end
+
+  npcscanner:SetUnit(unit)
+  local info = npcscanner:Line(2)
+  if not info then
+    return
+  end
+
+  if type(info) == "table" then
+    info = (info[1] or "") .. (info[2] or "")
+  end
+
+  if factionlist[info] then
+    -- exclude useless npc information about faction
+    return
+  end
+
+  for _, useless_info in pairs(useless_npcinfo_list) do
+    -- exclude useless npc information
+    if string.find(info, useless_info) then
+      return
+    end
+  end
+
+  return info
 end
 
 local libunitscan = CreateFrame("Frame", "pfUnitScan", UIParent)
@@ -66,6 +115,7 @@ libunitscan:RegisterEvent("PLAYER_TARGET_CHANGED")
 libunitscan:RegisterEvent("WHO_LIST_UPDATE")
 libunitscan:RegisterEvent("CHAT_MSG_SYSTEM")
 libunitscan:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
+libunitscan:RegisterEvent("UPDATE_FACTION")
 libunitscan:SetScript("OnEvent", function()
   if event == "PLAYER_ENTERING_WORLD" then
 
@@ -127,7 +177,7 @@ libunitscan:SetScript("OnEvent", function()
 
   elseif event == "UPDATE_MOUSEOVER_UNIT" or event == "PLAYER_TARGET_CHANGED" then
     local scan = event == "PLAYER_TARGET_CHANGED" and "target" or "mouseover"
-    local name, class, level, elite, _
+    local name, class, level, elite, guild, npcinfo, _
     if UnitIsPlayer(scan) then
       _, class = UnitClass(scan)
       level = UnitLevel(scan)
@@ -139,8 +189,13 @@ libunitscan:SetScript("OnEvent", function()
       elite = UnitClassification(scan)
       level = UnitLevel(scan)
       name = UnitName(scan)
-      AddData("mobs", name, class, level, elite)
+      if not UnitIsEnemy(scan, "player") then
+        npcinfo = GetNpcInfo(scan)
+      end
+      AddData("mobs", name, class, level, elite, nil, npcinfo)
     end
+  elseif event == "UPDATE_FACTION" then
+    UpdateFactionList()
   end
 end)
 

@@ -186,6 +186,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
         frame.color.prev:SetTexture(cr,cg,cb,ca)
 
         frame.color:SetScript("OnClick", function()
+          PlaySoundClickBox()
           local cr, cg, cb, ca = strsplit(",", category[config])
           if not cr or not cg or not cb or not ca then
             cr, cg, cb, ca = 1, 1, 1, 1
@@ -315,6 +316,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
         frame.input:SetHeight(14)
         frame.input:SetPoint("RIGHT" , -5, 1)
         frame.input:SetScript("OnClick", function ()
+          PlaySoundClickBox()
           if this:GetChecked() then
             this:GetParent().category[this:GetParent().config] = "1"
           else
@@ -432,6 +434,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
       if this.area:IsShown() then
         return
       else
+        PlaySoundChangeTab()
         -- hide all others
         for id, name in pairs(this.parent) do
           if type(name) == "table" and name.area and id ~= "parent" then
@@ -551,6 +554,8 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
     pfUI.gui:Hide()
 
     pfUI.gui:SetScript("OnShow",function()
+      PlaySoundOpenWindow()
+
       pfUI.gui.settingChanged = pfUI.gui.delaySettingChanged
       pfUI.gui.delaySettingChanged = nil
 
@@ -572,6 +577,8 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
 
       if pfUI.gui.settingChanged then
         pfUI.gui:Reload()
+      else
+        PlaySoundCloseWindow()
       end
       pfUI.gui:Hide()
     end)
@@ -792,6 +799,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
     end)
 
     pfUI.gui.search:SetScript("OnEditFocusGained", function(self)
+      PlaySoundClickBox()
       if this:GetText() == T["Search"] .. "..." then this:SetText("") end
       if this.indexed then return end
       -- Trigger "OnShow" for each subpage to initialize search index
@@ -1354,6 +1362,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
       donate:SetHeight(20)
       donate:SetText(T["Donate"])
       donate:SetScript("OnClick", function()
+        PlaySoundClickBox()
         pfUI.chat.urlcopy.CopyText("https://ko-fi.com/shagu")
       end)
       SkinButton(donate)
@@ -1364,6 +1373,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
       github:SetHeight(20)
       github:SetText(T["GitHub"])
       github:SetScript("OnClick", function()
+        PlaySoundClickBox()
         pfUI.chat.urlcopy.CopyText("https://github.com/shagu/pfUI")
       end)
       SkinButton(github)
@@ -1374,6 +1384,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
       website:SetHeight(20)
       website:SetText(T["Website"])
       website:SetScript("OnClick", function()
+        PlaySoundClickBox()
         pfUI.chat.urlcopy.CopyText("https://shagu.org/pfUI")
       end)
       SkinButton(website)

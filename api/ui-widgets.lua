@@ -1,6 +1,11 @@
 -- load pfUI environment
 setfenv(1, pfUI:GetEnvironment())
 
+function PlaySoundOpenWindow() PlaySound("igMainMenuOption") end
+function PlaySoundCloseWindow() PlaySound("igMainMenuOptionCheckBoxOff") end
+function PlaySoundChangeTab() PlaySound("igCharacterInfoTab") end
+function PlaySoundClickBox() PlaySound("igMainMenuOptionCheckBoxOff") end
+
 do -- statusbars
   local animations = {}
   local stepsize, val
@@ -150,6 +155,7 @@ do -- dropdown
   end
 
   local function ListEntryOnClick()
+    PlaySoundClickBox()
     this.parent:SetSelection(this.id)
 
     if this.parent.mode == "MULTISELECT" then
@@ -172,6 +178,7 @@ do -- dropdown
   end
 
   local function ListButtonOnClick()
+    PlaySoundClickBox()
     if this.ToggleMenu then
       this:ToggleMenu()
     else
@@ -1078,7 +1085,11 @@ function pfUI.api.CreateQuestionDialog(text, yes, no, editbox, onclose)
     this:StopMovingOrSizing()
   end)
 
-  question:SetScript("OnHide", onclose)
+  PlaySoundOpenWindow()
+  question:SetScript("OnHide", function()
+    PlaySoundCloseWindow()
+    if onclose then onclose() end
+  end)
 
   pfUI.api.CreateBackdrop(question, nil, nil, .85)
   pfUI.api.CreateBackdropShadow(question)

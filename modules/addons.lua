@@ -32,10 +32,15 @@ pfUI:RegisterModule("addons", "vanilla:tbc", function ()
   CreateBackdrop(pfUI.addons, nil, true, .75)
   CreateBackdropShadow(pfUI.addons)
 
+  pfUI.addons:SetScript("OnShow", function()
+    PlaySoundOpenWindow()
+  end)
   pfUI.addons:SetScript("OnHide", function()
     if this.hasChanged then
       pfUI.gui:Reload()
       this.hasChanged = nil
+    else
+      PlaySoundCloseWindow()
     end
   end)
 
@@ -245,6 +250,7 @@ pfUI:RegisterModule("addons", "vanilla:tbc", function ()
   end
 
   local function InputOnClick()
+    PlaySoundClickBox()
     if this:GetChecked() then
       EnableAddOn(this:GetID())
     else

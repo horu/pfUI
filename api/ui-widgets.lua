@@ -1043,6 +1043,7 @@ end
 -- 'no'         [function]      function that is triggered on 'Cancel' button.
 -- 'editbox'    [bool]          if set, a inputfield will be shown. it can be.
 --                              accessed with "GetParent().input".
+tinsert(UISpecialFrames, "pfQuestionDialog")
 function pfUI.api.CreateQuestionDialog(text, yes, no, editbox, onclose)
   -- do not allow multiple instances of question dialogs
   if _G["pfQuestionDialog"] and _G["pfQuestionDialog"]:IsShown() then
@@ -1071,6 +1072,7 @@ function pfUI.api.CreateQuestionDialog(text, yes, no, editbox, onclose)
 
   -- frame
   local question = CreateFrame("Frame", "pfQuestionDialog", UIParent)
+  _G["pfQuestionDialog"] = question
   question:ClearAllPoints()
   question:SetPoint("CENTER", 0, 0)
   question:SetFrameStrata("TOOLTIP")

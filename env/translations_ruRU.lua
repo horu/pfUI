@@ -787,4 +787,6 @@ pfUI_translation["ruRU"] = {
   ["Zone Name"] = "Название зоны",
   ["Zoom & Fade"] = "Увеличение и затухание",
   ["Zoom Target Nameplate"] = "Увеличить индикатор здоровья цели",
+  ["Cancel"] = "Отмена",
+  ["Do you want to cancel current changes and reload the UI?"] = "Вы хотите отменить текущие изменения и перезагрузить пользовательский интерфейс?",
 }

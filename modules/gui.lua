@@ -556,6 +556,9 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
     pfUI.gui:SetScript("OnShow",function()
       PlaySoundOpenWindow()
 
+      -- save current config for rollback if user will cancel changes
+      pfUI.gui.rollbackConfig = CopyTable(C)
+
       pfUI.gui.settingChanged = pfUI.gui.delaySettingChanged
       pfUI.gui.delaySettingChanged = nil
 
@@ -682,6 +685,40 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
     end)
     SkinButton(pfUI.gui.share)
 
+    -- Cancel
+    pfUI.gui.cancel = CreateFrame("Button", nil, pfUI.gui)
+    pfUI.gui.cancel:SetPoint("TOPRIGHT", pfUI.gui.frames.area.backdrop, "BOTTOMRIGHT", 0, -5)
+    -- pfUI.gui.cancel:SetPoint("LEFT", pfUI.gui.ok, "RIGHT", 5, 0)
+    pfUI.gui.cancel:SetWidth(110)
+    pfUI.gui.cancel:SetHeight(25)
+    pfUI.gui.cancel:SetText(T["Cancel"])
+    pfUI.gui.cancel:SetScript("OnClick", function()
+      if pfUI.gui.rollbackConfig then
+        CreateQuestionDialog(T["Do you want to cancel current changes and reload the UI?"], function()
+          _G["pfUI_config"] = pfUI.gui.rollbackConfig
+          pfUI.gui.rollbackConfig = nil
+          pfUI.gui.settingChanged = nil
+          pfUI:LoadConfig()
+          ReloadUI()
+          pfUI.gui:Hide()
+        end)
+      end
+    end)
+
+    SkinButton(pfUI.gui.cancel)
+
+    -- Ok
+    pfUI.gui.ok = CreateFrame("Button", nil, pfUI.gui)
+    pfUI.gui.ok:SetPoint("RIGHT", pfUI.gui.cancel, "LEFT", -5, 0)
+    pfUI.gui.ok:SetWidth(110)
+    pfUI.gui.ok:SetHeight(25)
+    pfUI.gui.ok:SetText(T["Ok"])
+    pfUI.gui.ok:SetScript("OnClick", function()
+      pfUI.gui:Hide()
+    end)
+
+    SkinButton(pfUI.gui.ok)
+
     -- searchbar
     local function SearchEntryClick()
       -- clear search focus
@@ -726,7 +763,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
 
     pfUI.gui.search = CreateFrame("EditBox", nil, pfUI.gui)
     pfUI.gui.search:SetPoint("LEFT", pfUI.gui.share, "RIGHT", 5, 0)
-    pfUI.gui.search:SetPoint("TOPRIGHT", pfUI.gui.frames.area.backdrop, "BOTTOMRIGHT", 0, -5)
+    pfUI.gui.search:SetPoint("RIGHT", pfUI.gui.ok, "LEFT", -5, 0)
     pfUI.gui.search:SetHeight(25)
     pfUI.gui.search:SetAutoFocus(false)
     pfUI.gui.search:SetTextInsets(5, 5, 5, 5)

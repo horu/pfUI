@@ -614,11 +614,17 @@ pfUI:RegisterModule("panel", "vanilla:tbc", function()
 
   if pfUI.chat then
     pfUI.panel.left:SetScale(pfUI.chat.left:GetScale())
-    pfUI.panel.left:SetWidth(tonumber(C.chat.left.width) - 4)
     pfUI.panel.left:SetPoint("BOTTOM", pfUI.chat.left, "BOTTOM", 0, 2)
   else
-    pfUI.panel.left:SetWidth(C.chat.left.width)
     pfUI.panel.left:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 5, 5)
+  end
+
+  if C.panel.left.width ~= "-1" then
+    pfUI.panel.left:SetWidth(C.panel.left.width)
+  elseif pfUI.chat then
+    pfUI.panel.left:SetWidth(tonumber(C.chat.left.width) - 4)
+  else
+    pfUI.panel.left:SetWidth(C.chat.left.width)
   end
 
   pfUI.panel.left:SetFrameStrata("DIALOG")
@@ -701,11 +707,17 @@ pfUI:RegisterModule("panel", "vanilla:tbc", function()
   pfUI.panel.right:ClearAllPoints()
   if pfUI.chat then
     pfUI.panel.right:SetScale(pfUI.chat.right:GetScale())
-    pfUI.panel.right:SetWidth(tonumber(C.chat.right.width) - 4)
     pfUI.panel.right:SetPoint("BOTTOM", pfUI.chat.right, "BOTTOM", 0, 2)
   else
-    pfUI.panel.right:SetWidth(C.chat.right.width)
     pfUI.panel.right:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", -5, 5)
+  end
+
+  if C.panel.right.width ~= "-1" then
+    pfUI.panel.right:SetWidth(C.panel.right.width)
+  elseif pfUI.chat then
+    pfUI.panel.right:SetWidth(tonumber(C.chat.right.width) - 4)
+  else
+    pfUI.panel.right:SetWidth(C.chat.right.width)
   end
 
   pfUI.panel.right:SetFrameStrata("DIALOG")

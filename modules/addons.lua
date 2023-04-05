@@ -37,7 +37,7 @@ pfUI:RegisterModule("addons", "vanilla:tbc", function ()
   end)
   pfUI.addons:SetScript("OnHide", function()
     if this.hasChanged then
-      pfUI.gui:Reload()
+      pfUI.gui.Reload()
       this.hasChanged = nil
     else
       PlaySoundCloseWindow()

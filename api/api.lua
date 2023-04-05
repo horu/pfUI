@@ -1314,3 +1314,70 @@ function pfUI.api.GetNoNameObject(frame, objtype, layer, arg1, arg2)
     end
   end
 end
+
+function pfUI.api.ToString(value, depth, itlimit, short)
+  depth = depth or 1
+  itlimit = itlimit or 50
+  if type(value) == 'table' then
+    local str = '{'
+    if not short then
+      str = str .. tostring(value) .. ': '
+    end
+    if depth > 1 then
+      local count = 0
+      for ikey, ivalue in pairs(value) do
+        local str_key = ToString(ikey, depth - 1, itlimit, short)
+        if short then
+          str_key = string.sub(str_key, 0, 2)
+        end
+        str = str .. '['..str_key..'] = ' .. ToString(ivalue, depth - 1, itlimit, short) .. ','
+        count = count + 1
+        if count >= itlimit then
+          str = str .. '... '
+          break
+        end
+      end
+      str = str .. '}'
+      return str
+    else
+      return str..'... } '
+    end
+  elseif type(value) == 'string' then
+    if short then
+      return tostring(value)
+    end
+    return '"'..tostring(value)..'"'
+  end
+  return tostring(value)
+end
+
+function pfUI.api.GetDiff(leftTable, rightTable, depth)
+  depth = depth or 1
+
+  local diff = {}
+
+  for key, value in pairs(leftTable) do
+    if type(value) == "table" then
+      local rightValue = rightTable[key];
+      if type(rightValue) ~= "table" then
+        table.insert(diff, { left = leftTable, right = nil, key = key })
+      elseif depth > 1 then
+        local difflist = GetDiff(value, rightValue, depth - 1)
+        for _, diffvalue in pairs(difflist) do
+          table.insert(diff, diffvalue)
+        end
+      end
+    elseif value ~= rightTable[key] then
+      table.insert(diff, { left = leftTable, right = rightTable, key = key })
+    end
+  end
+
+  -- Check for any keys that are in rightTable and not leftTable.
+  for key, value in pairs(rightTable) do
+    if leftTable[key] == nil then
+      table.insert(diff, { left = nil, right = rightTable, key = key })
+    end
+  end
+
+  return diff
+end

@@ -1044,7 +1044,7 @@ end
 -- 'editbox'    [bool]          if set, a inputfield will be shown. it can be.
 --                              accessed with "GetParent().input".
 tinsert(UISpecialFrames, "pfQuestionDialog")
-function pfUI.api.CreateQuestionDialog(text, yes, no, editbox, onclose)
+function pfUI.api.CreateQuestionDialog(text, yes, no, editbox, onclose, textJustify)
   -- do not allow multiple instances of question dialogs
   if _G["pfQuestionDialog"] and _G["pfQuestionDialog"]:IsShown() then
     _G["pfQuestionDialog"]:Hide()
@@ -1102,6 +1102,9 @@ function pfUI.api.CreateQuestionDialog(text, yes, no, editbox, onclose)
   question.text:SetPoint("TOPLEFT", question, "TOPLEFT", padding, -padding)
   question.text:SetPoint("TOPRIGHT", question, "TOPRIGHT", -padding, -padding)
   question.text:SetText(text)
+  if textJustify then
+    question.text:SetJustifyH(textJustify)
+  end
 
   -- editbox
   if editbox then

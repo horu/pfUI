@@ -3,17 +3,92 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
 
   -- "searchDB" gets populated when CreateConfig is called. The table holds
   -- information about the title, its parent buttons and the frame itself:
-  --   searchDB[tostring(frame)][-1] = frame
-  --                             [0] = caption
-  --                           [1-X] = parent buttons
+  --   searchDB[category][config][-1] = frame
+  --                              [0] = caption
+  --                            [1-X] = parent buttons
+  --                         category = category table from global config table C
+  --                           config = string option value from category
   local searchDB = {}
 
+  local function BuildCaption(obj)
+    local caption = ""
+    for x=table.getn(obj),1,-1 do
+      caption = caption .. "|cff33ffcc" .. obj[x].text:GetText() .. "|r » "
+    end
+    caption = caption .. "|cffffffff" .. obj[0]
+    return caption
+  end
+
+  local function BuildConfigDiffLine(category, config, oldvalue)
+    local obj = searchDB[category][config]
+    local caption = BuildCaption(obj)
+    local line = caption .. "|r » " ..
+            "|cff00ff00" .. "new: " .. category[config] ..
+            "|r" .. "/" .. "|cffff0000" .. "old: " .. oldvalue
+    return line
+  end
+
+  local function BuildConfigDiff()
+    local diff
+    if pfUI.gui.rollbackConfig then
+      diff = GetDiff(C, pfUI.gui.rollbackConfig, 10)
+    end
+    if not next(diff) then
+      return
+    end
+
+    local configDiff = ""
+    for _, diffvalue in diff do
+      local oldvalue = diffvalue.right[diffvalue.key]
+      configDiff = configDiff .. BuildConfigDiffLine(diffvalue.left, diffvalue.key, oldvalue) .. "\n"
+    end
+    return configDiff
+  end
+
+  local function BuildWaitingReloadConfigDiff()
+    if not pfUI.gui.waitingReloadSettings then
+      return
+    end
+
+    local configDiff = ""
+    for category, configlist in pfUI.gui.waitingReloadSettings do
+      for config, value in configlist do
+        if category[config] ~= value then
+          -- config value is steel changed, need reload. Add config line to list.
+          configDiff = configDiff .. BuildConfigDiffLine(category, config, value) .. "\n"
+        end
+      end
+    end
+    return configDiff ~= "" and configDiff
+  end
+
+  local function AddWaitingReloadSetting(category, config)
+    local rollbackCategory
+    local diff = pfUI.gui.rollbackConfig and GetDiff(C, pfUI.gui.rollbackConfig, 10) or {}
+    for _, diffvalue in diff do
+      if diffvalue.left == category then
+        rollbackCategory = diffvalue.right
+        break
+      end
+    end
+
+    pfUI.gui.waitingReloadSettings = pfUI.gui.waitingReloadSettings or {}
+    pfUI.gui.waitingReloadSettings[category] = pfUI.gui.waitingReloadSettings[category] or {}
+    local oldvalue = pfUI.gui.waitingReloadSettings[category][config] or rollbackCategory[config]
+    pfUI.gui.waitingReloadSettings[category][config] = oldvalue
+  end
+
   do -- Core Functions/Variables
-    function Reload()
-      CreateQuestionDialog(T["Some settings need to reload the UI to take effect.\nDo you want to reload now?"], function()
-        pfUI.gui.settingChanged = nil
+    function Reload(configDiff)
+      local message = T["Some settings need to reload the UI to take effect.\nDo you want to reload now?"]
+      if configDiff then
+        message = message .. "\n\n" .. T["Changes"] .. ":\n" .. configDiff
+      end
+      local reload = function()
+        pfUI.gui.waitingReloadSettings = nil
         ReloadUI()
-      end)
+      end
+      CreateQuestionDialog(message, reload, nil, nil, nil, "LEFT")
     end
 
     U = setmetatable({}, { __index = function(tab,key)
@@ -81,18 +156,19 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
 
       -- populate search index
       if caption and this and this.GetParent and widget ~= "button" and widget ~= "header" then
-        local id = tostring(frame)
+        searchDB[category] = searchDB[category] or {}
+        searchDB[category][config] = searchDB[category][config] or {}
+        local index = searchDB[category][config]
 
-        searchDB[id] = searchDB[id] or { }
-        searchDB[id][0] = caption
-        searchDB[id][-1] = frame
+        index[0] = caption
+        index[-1] = frame
 
         -- scrollchild scrollframe  Area        Area        Btton
         -- this        .parent      :GetParent():GetParent().button
         -- this        .parent      :GetParent().button
         local scrollframe = this.parent
         while scrollframe.GetParent and scrollframe:GetParent() and scrollframe:GetParent().button do
-          table.insert(searchDB[id], scrollframe:GetParent().button)
+          table.insert(index, scrollframe:GetParent().button)
           scrollframe = scrollframe:GetParent()
         end
       end
@@ -206,7 +282,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
 
             if not this:GetParent():IsShown() then
               category[config] = r .. "," .. g .. "," .. b .. "," .. a
-              if ufunc then ufunc() else pfUI.gui.settingChanged = true end
+              if ufunc then ufunc() else AddWaitingReloadSetting(category, config) end
             end
           end
 
@@ -272,7 +348,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
           if ( type and type ~= "number" ) or tonumber(this:GetText()) then
             if this:GetText() ~= this:GetParent().category[this:GetParent().config] then
               this:GetParent().category[this:GetParent().config] = this:GetText()
-              if ufunc then ufunc() else pfUI.gui.settingChanged = true end
+              if ufunc then ufunc() else AddWaitingReloadSetting(category, config) end
             end
             this:SetTextColor(.2,1,.8,1)
           else
@@ -323,7 +399,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
             this:GetParent().category[this:GetParent().config] = "0"
           end
 
-          if ufunc then ufunc() else pfUI.gui.settingChanged = true end
+          if ufunc then ufunc() else AddWaitingReloadSetting(category, config) end
         end)
 
         if category[config] == "1" then frame.input:SetChecked() end
@@ -355,7 +431,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
             entry.func = function()
               if category[config] ~= value then
                 category[config] = value
-                if ufunc then ufunc() else pfUI.gui.settingChanged = true end
+                if ufunc then ufunc() else AddWaitingReloadSetting(category, config) end
               end
             end
 
@@ -389,7 +465,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
             if id ~= sel then newconf = newconf .. "#" .. val end
           end
           category[config] = newconf
-          if ufunc then ufunc() else pfUI.gui.settingChanged = true end
+          if ufunc then ufunc() else AddWaitingReloadSetting(category, config) end
           frame.input:UpdateMenu()
         end)
 
@@ -404,7 +480,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
         frame.add:SetScript("OnClick", function()
           CreateQuestionDialog(T["New entry:"], function()
             category[config] = category[config] .. "#" .. this:GetParent().input:GetText()
-            if ufunc then ufunc() else pfUI.gui.settingChanged = true end
+            if ufunc then ufunc() else AddWaitingReloadSetting(category, config) end
             frame.input:UpdateMenu()
           end, false, true)
         end)
@@ -559,9 +635,6 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
       -- save current config for rollback if user will cancel changes
       pfUI.gui.rollbackConfig = CopyTable(C)
 
-      pfUI.gui.settingChanged = pfUI.gui.delaySettingChanged
-      pfUI.gui.delaySettingChanged = nil
-
       -- exit unlock mode
       if pfUI.unlock and pfUI.unlock:IsShown() then
         pfUI.unlock:Hide()
@@ -578,8 +651,9 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
         ColorPickerFrame:Hide()
       end
 
-      if pfUI.gui.settingChanged then
-        pfUI.gui:Reload()
+      local configDiff = BuildWaitingReloadConfigDiff()
+      if configDiff then
+        pfUI.gui.Reload(configDiff)
       else
         PlaySoundCloseWindow()
       end
@@ -693,15 +767,22 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
     pfUI.gui.cancel:SetHeight(25)
     pfUI.gui.cancel:SetText(T["Cancel"])
     pfUI.gui.cancel:SetScript("OnClick", function()
-      if pfUI.gui.rollbackConfig then
-        CreateQuestionDialog(T["Do you want to cancel current changes and reload the UI?"], function()
+      local configDiff = BuildConfigDiff()
+      if configDiff then
+        local rollback = function()
           _G["pfUI_config"] = pfUI.gui.rollbackConfig
           pfUI.gui.rollbackConfig = nil
-          pfUI.gui.settingChanged = nil
+          pfUI.gui.waitingReloadSettings = nil
           pfUI:LoadConfig()
           ReloadUI()
           pfUI.gui:Hide()
-        end)
+        end
+
+        CreateQuestionDialog(
+                T["Do you want to cancel current changes and reload the UI?"] .. "\n\n" .. T["Changes"] .. ":\n" .. configDiff,
+                rollback, nil, nil, nil, "LEFT")
+      else
+        pfUI.gui:Hide()
       end
     end)
 
@@ -803,23 +884,20 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
 
       local i = 1
       local search = strlower(this:GetText())
-      for name, obj in pairs(searchDB) do
-        local title = obj[0] and strlower(obj[0])
-        if strfind(title, search) then
-          -- build caption string
-          local caption = ""
-          for x=table.getn(obj),1,-1 do
-            caption = caption .. "|cff33ffcc" .. obj[x].text:GetText() .. "|r » "
+      for _, config in pairs(searchDB) do
+        for _, obj in pairs(config) do
+          local title = obj[0] and strlower(obj[0])
+          if strfind(title, search) then
+            local caption = BuildCaption(obj)
+
+            -- build search entry button
+            scroll.results[i] = scroll.results[i] or CreateSearchEntry(scroll, i)
+            scroll.results[i].obj = obj
+            scroll.results[i].text:SetText(caption)
+            scroll.results[i]:Show()
+
+            i = i + 1
           end
-          caption = caption .. "|cffffffff" .. obj[0]
-
-          -- build search entry button
-          scroll.results[i] = scroll.results[i] or CreateSearchEntry(scroll, i)
-          scroll.results[i].obj = obj
-          scroll.results[i].text:SetText(caption)
-          scroll.results[i]:Show()
-
-          i = i + 1
         end
       end
 
@@ -1528,7 +1606,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
             _G["pfUI_cache"] = {}
             pfUI:LoadConfig()
             this:GetParent():Hide()
-            pfUI.gui:Reload()
+            pfUI.gui.Reload()
           end)
       end)
 
@@ -1539,7 +1617,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
             _G["pfUI_init"] = {}
             pfUI:LoadConfig()
             this:GetParent():Hide()
-            pfUI.gui:Reload()
+            pfUI.gui.Reload()
           end)
       end, true)
 
@@ -1549,7 +1627,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
             _G["pfUI_playerDB"] = {}
             _G["pfUI_cache"] = {}
             this:GetParent():Hide()
-            pfUI.gui:Reload()
+            pfUI.gui.Reload()
           end)
       end, true)
 

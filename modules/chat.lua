@@ -681,6 +681,12 @@ pfUI:RegisterModule("chat", "vanilla:tbc", function ()
   local function AddMessage(frame, text, a1, a2, a3, a4, a5)
     if not text then return end
 
+    for _, val in pairs(pfUI.chat.blacklist) do
+      if string.find(text, val) then
+        return
+      end
+    end
+
     -- skip chat parsing on combat log
     if frame.pfCombatLog then
       return frame:HookAddMessage(text, a1, a2, a3, a4, a5)
@@ -791,5 +797,11 @@ pfUI:RegisterModule("chat", "vanilla:tbc", function ()
       end
       pfHookSetItemRef(link, text, button)
     end
+  end
+
+  pfUI.chat.blacklist = {}
+  for _, val in pairs({strsplit("#", C.chat.text.blacklist)}) do
+    DEFAULT_CHAT_FRAME:AddMessage(T["Added to chat blacklist: "] .. "|cffff2020" .. val)
+    table.insert(pfUI.chat.blacklist, val)
   end
 end)

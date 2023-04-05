@@ -2306,6 +2306,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
       CreateConfig(nil, T["Enable Party Chat Bubbles"], "CVAR", "chatBubblesParty", "checkbox")
       CreateConfig(nil, T["Enable Chat Bubble Borders"], C.chat.bubbles, "borders", "checkbox")
       CreateConfig(nil, T["Chat Bubble Transparency"], C.chat.bubbles, "alpha")
+      CreateConfig(nil, T["Chat phrases blacklist"], C.chat.text, "blacklist", "list")
     end)
 
     CreateGUIEntry(T["Nameplates"], nil, function()

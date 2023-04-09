@@ -147,25 +147,34 @@ end)
 -- since TargetByName can only be triggered within vanilla,
 -- we can't auto-scan targets on further expansions.
 if pfUI.client <= 11200 then
-  -- setup sound function switches
+  -- setup ui function switches
+  local Off = function() end
   local SoundOn = PlaySound
-  local SoundOff = function() return end
+  local UiErrorOn = UIErrorsFrame.AddMessage
 
   libunitscan:SetScript("OnUpdate", function()
     -- don't scan when another unit is in target
     if UnitExists("target") or UnitName("target") then return end
 
+    -- setup target function switches
+    local targetFrame = pfUI.uf.target or TargetFrame
+    local TargetOn = targetFrame.Show
+
     local name = next(queue)
     if name then
-      -- disable sound
-      _G.PlaySound = SoundOff
+      -- disable sound/error messages/target frame
+      _G.PlaySound = Off
+      UIErrorsFrame.AddMessage = Off
+      targetFrame.Show = Off
 
       -- try to target the unknown unit
       TargetByName(name, true)
       ClearTarget()
 
-      -- enable sound again
+      -- enable sound/error messages/target frame
       _G.PlaySound = SoundOn
+      UIErrorsFrame.AddMessage = UiErrorOn
+      targetFrame.Show = TargetOn
 
       queue[name] = nil
     end

@@ -1192,7 +1192,8 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
         "combat:" .. T["Combat Timer"],
         "ammo:" .. T["Ammo Counter"],
         "soulshard:" .. T["Soulshard Counter"],
-        "bagspace:" .. T["Bagspace"]
+        "bagspace:" .. T["Bagspace"],
+        "custom:" .. T["Custom script"],
       },
       ["tooltip_position"] = {
         "bottom:" .. T["Bottom"],
@@ -2177,6 +2178,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
       CreateConfig(nil, T["Enable 24h Clock"], C.global, "twentyfour", "checkbox")
       CreateConfig(nil, T["Servertime"], C.global, "servertime", "checkbox")
       CreateConfig(U["panel"], T["Show FPS and Latency Colors"], C.panel, "fpscolors", "checkbox")
+      CreateConfig(nil, T["Custom script"], C.panel, "customscript", "list")
 
       CreateConfig(nil, T["Auto Hide"], nil, nil, "header")
       CreateConfig(nil, T["Enable Autohide For Left Chat Panel"], C.panel, "hide_leftchat", "checkbox")

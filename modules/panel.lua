@@ -561,6 +561,22 @@ pfUI:RegisterModule("panel", "vanilla:tbc", function()
         pfUI.panel:OutputPanel("soulshard", T["Soulshards"] .. ": " .. count)
       end)
     end
+
+    do -- Custom script
+      local widget = CreateFrame("Frame", "pfPanelWidgetCustom", UIParent)
+
+      local script_to_call = "local script = function() "
+      for _, line in pairs({strsplit("#", C.panel.customscript)}) do
+        script_to_call = script_to_call .. line .. "; "
+      end
+      script_to_call = script_to_call .. " end; pfUICustomScriptReturnValue=script()"
+
+      widget:SetScript("OnUpdate",function()
+        if ( this.tick or 0.2) > GetTime() then return else this.tick = GetTime() + 0.2 end
+        RunScript(script_to_call)
+        pfUI.panel:OutputPanel("custom", tostring(pfUICustomScriptReturnValue))
+      end)
+    end
   end
 
   pfUI.panel = {}

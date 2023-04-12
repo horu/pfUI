@@ -566,6 +566,7 @@ function pfUI:LoadConfig()
   pfUI:UpdateConfig("panel",      "other",       "minimap",          "zone")
   pfUI:UpdateConfig("panel",      "micro",       "enable",           "0")
   pfUI:UpdateConfig("panel",      nil,           "fpscolors",        "1")
+  pfUI:UpdateConfig("panel",      nil,           "customscript",     "return UnitMana(\"player\")")
 
   pfUI:UpdateConfig("panel",      "bag",         "ignorespecial",    "1")
   pfUI:UpdateConfig("panel",      "xp",          "xp_always",        "0")

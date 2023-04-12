@@ -144,6 +144,7 @@ pfUI_translation["zhCN"] = {
   ["Cooldown Text Size"] = nil,
   ["Cooldown Text Time Threshold"] = "技能冷却时间文字临界值",
   ["Coordinates Location"] = "坐标位置",
+  ["Custom script"] = nil,
   ["Count"] = "计数器",
   ["Create Profile"] = "新建配置",
   ["Ctrl-Click"] = "CTRL点击",

@@ -144,6 +144,7 @@ pfUI_translation["enUS"] = {
   ["Cooldown Text Size"] = nil,
   ["Cooldown Text Time Threshold"] = nil,
   ["Coordinates Location"] = nil,
+  ["Custom script"] = nil,
   ["Count"] = nil,
   ["Create Profile"] = nil,
   ["Ctrl-Click"] = nil,

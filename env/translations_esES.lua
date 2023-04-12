@@ -144,6 +144,7 @@ pfUI_translation["esES"] = {
   ["Cooldown Text Size"] = "Tamaño del texto del tiempo de reutilización",
   ["Cooldown Text Time Threshold"] = "Umbral del texto del tiempo de reutilización",
   ["Coordinates Location"] = "Coordenadas de localización",
+  ["Custom script"] = nil,
   ["Count"] = "Recuento",
   ["Create Profile"] = "Crear perfil",
   ["Ctrl-Click"] = "Ctrl-Clic",

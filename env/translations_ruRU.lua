@@ -144,6 +144,7 @@ pfUI_translation["ruRU"] = {
   ["Cooldown Text Size"] = "Размер текста восстановления",
   ["Cooldown Text Time Threshold"] = "Порог текста восстановления",
   ["Coordinates Location"] = "Расположение координат",
+  ["Custom script"] = "Пользовательский скрипт",
   ["Count"] = "Счет",
   ["Create Profile"] = "Создать профиль",
   ["Ctrl-Click"] = "Ctrl+нажатие",

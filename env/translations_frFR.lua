@@ -365,6 +365,7 @@ pfUI_translation["frFR"] = {
   ["Hide Chat When Bags Are Opened"] = "Masquer le chat quand les sacs sont ouverts",
   ["Hide Combat Log"] = "Masquer le journal de combat",
   ["Hide Foreign Cooldown Animations"] = "Masquer les animations de temps de recharge étrangères",
+  ["Hide Time Units ( m, h, d )"] = nil,
   ["Hide Group Frames While In Raid"] = "Masquer l'UI Groupe en Raid",
   ["Hide Healthbar On Critters"] = "Masquer la barre de vie des bêtes",
   ["Hide Healthbar On Enemy NPCs"] = "Masquer la barre de vie des PNJs ennemis",

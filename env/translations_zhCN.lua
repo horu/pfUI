@@ -365,6 +365,7 @@ pfUI_translation["zhCN"] = {
   ["Hide Chat When Bags Are Opened"] = "打开背包后隐藏聊天框",
   ["Hide Combat Log"] = "隐藏战斗日志",
   ["Hide Foreign Cooldown Animations"] = nil,
+  ["Hide Time Units ( m, h, d )"] = nil,
   ["Hide Group Frames While In Raid"] = "在团队框架下隐藏小队框架",
   ["Hide Healthbar On Critters"] = nil,
   ["Hide Healthbar On Enemy NPCs"] = nil,

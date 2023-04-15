@@ -1684,6 +1684,7 @@ pfUI:RegisterModule("gui", "vanilla:tbc", function ()
       CreateConfig(nil, T["Enable Durations On Blizzard Frames"], C.appearance.cd, "blizzard", "checkbox")
       CreateConfig(nil, T["Enable Durations On Foreign Frames"], C.appearance.cd, "foreign", "checkbox")
       CreateConfig(nil, T["Hide Foreign Cooldown Animations"], C.appearance.cd, "hideanim", "checkbox")
+      CreateConfig(nil, T["Hide Time Units ( m, h, d )"], C.appearance.cd, "hidetimeunits", "checkbox")
     end)
 
     CreateGUIEntry(T["Settings"], T["Screenshot"], function()

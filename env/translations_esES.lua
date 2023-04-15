@@ -350,6 +350,7 @@ pfUI_translation["esES"] = {
   ["Healthbar Texture"] = "Textura de la barra de salud",
   ["Health Bar Texture"] = nil,
   ["Healthbar Vertical Offset"] = "Desplazamiento vertical de la barra de salud",
+  ["Hide Time Units ( m, h, d )"] = nil,
   ["Health Bar Width"] = "Ancho de la barra de salud",
   ["Health - Current"] = "Salud - Actual",
   ["Health - Max"] = "Salud - Máx",

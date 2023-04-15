@@ -1200,13 +1200,13 @@ function pfUI.api.GetColoredTimeString(remaining)
   if not remaining then return "" end
   if remaining > 356400 then -- Show days if remaining is > 99 Hours (99 * 60 * 60)
     local r,g,b,a = pfUI.api.GetStringColor(C.appearance.cd.daycolor)
-    return pfUI.api.rgbhex(r,g,b) .. round(remaining / 86400) .. "|rd"
+    return pfUI.api.rgbhex(r,g,b) .. round(remaining / 86400) .. "|r" .. (C.appearance.cd.hidetimeunits == "1" and "" or "d")
   elseif remaining > 5940 then -- Show hours if remaining is > 99 Minutes (99 * 60)
     local r,g,b,a = pfUI.api.GetStringColor(C.appearance.cd.hourcolor)
-    return pfUI.api.rgbhex(r,g,b) .. round(remaining / 3600) .. "|rh"
+    return pfUI.api.rgbhex(r,g,b) .. round(remaining / 3600) .. "|r" .. (C.appearance.cd.hidetimeunits == "1" and "" or "h")
   elseif remaining > 99 then -- Show minutes if remaining is > 99 Seconds (99)
     local r,g,b,a = pfUI.api.GetStringColor(C.appearance.cd.minutecolor)
-    return pfUI.api.rgbhex(r,g,b) .. round(remaining / 60) .. "|rm"
+    return pfUI.api.rgbhex(r,g,b) .. round(remaining / 60) .. "|r" .. (C.appearance.cd.hidetimeunits == "1" and "" or "m")
   elseif remaining <= 5 and pfUI_config.appearance.cd.milliseconds == "1" then
     local r,g,b,a = pfUI.api.GetStringColor(C.appearance.cd.lowcolor)
     return pfUI.api.rgbhex(r,g,b) .. string.format("%.1f", round(remaining,1))

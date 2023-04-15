@@ -365,6 +365,7 @@ pfUI_translation["ruRU"] = {
   ["Hide Chat When Bags Are Opened"] = "Скрыть чат, когда сумки открыты",
   ["Hide Combat Log"] = "Скрыть журнал боя",
   ["Hide Foreign Cooldown Animations"] = "Скрыть сторонние анимации перезарядки",
+  ["Hide Time Units ( m, h, d )"] = "Скрыть единицы измерения времени ( m, h, d )",
   ["Hide Group Frames While In Raid"] = "Скрыть окно группы, когда в рейде",
   ["Hide Healthbar On Critters"] = "Скрыть панель здоровья существ",
   ["Hide Healthbar On Enemy NPCs"] = "Скрыть панель здоровья вражеских NPC",

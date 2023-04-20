@@ -340,6 +340,16 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     nameplate.totem.icon:SetAllPoints()
     CreateBackdrop(nameplate.totem)
 
+    nameplate.pvpIcon = CreateFrame("Frame", nil, nameplate)
+    nameplate.pvpIcon.texture = nameplate.pvpIcon:CreateTexture(nil,"BACKGROUND")
+    nameplate.pvpIcon:SetWidth(14)
+    nameplate.pvpIcon:SetHeight(14)
+    nameplate.pvpIcon:SetPoint("LEFT", nameplate.name, "RIGHT", 0, -1)
+    nameplate.pvpIcon.texture:SetTexture(pfUI.media["img:pvp"])
+    nameplate.pvpIcon.texture:SetAllPoints(nameplate.pvpIcon)
+    nameplate.pvpIcon.texture:SetVertexColor(1,1,1,1)
+    nameplate.pvpIcon:Hide()
+
     do -- debuffs
       nameplate.debuffs = {}
       CreateDebuffIcon(nameplate, 1)
@@ -507,7 +517,7 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     local hpmin, hpmax = plate.original.healthbar:GetMinMaxValues()
     local name = plate.original.name:GetText()
     local level = plate.original.level:IsShown() and plate.original.level:GetObjectType() == "FontString" and tonumber(plate.original.level:GetText()) or "??"
-    local class, ulevel, elite, player, guild, npcinfo = GetUnitData(name, true)
+    local class, ulevel, elite, player, guild, npcinfo, pvp = GetUnitData(name, true)
     local target = plate.istarget
     local mouseover = UnitExists("mouseover") and plate.original.glow:IsShown() or nil
     local unitstr = target and "target" or mouseover and "mouseover" or nil
@@ -617,6 +627,12 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
       plate.health:Show()
       plate.glow:SetPoint("CENTER", plate.health, "CENTER", 0, 0)
       plate.totem:Hide()
+    end
+
+    if C.nameplates.showpvp == "1" and pvp then
+      plate.pvpIcon:Show()
+    else
+      plate.pvpIcon:Hide()
     end
 
     plate.additionalinfo:SetPoint("BOTTOM", plate.name, "BOTTOM", 0, font_size + tonumber(C.nameplates.additionaloffset))

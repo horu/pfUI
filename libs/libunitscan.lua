@@ -52,7 +52,7 @@ end
 function GetUnitData(name, active)
   if units["players"][name] then
     local ret = units["players"][name]
-    return ret.class, ret.level, ret.elite, true, ret.guild, nil
+    return ret.class, ret.level, ret.elite, true, ret.guild, nil, ret.pvp
   elseif units["mobs"][name] then
     local ret = units["mobs"][name]
     return ret.class, ret.level, ret.elite, nil, nil, ret.npcinfo
@@ -62,7 +62,7 @@ function GetUnitData(name, active)
   end
 end
 
-local function AddData(db, name, class, level, elite, guild, npcinfo)
+local function AddData(db, name, class, level, elite, guild, npcinfo, pvp)
   if not name or not db then return end
   units[db] = units[db] or {}
   units[db][name] = units[db][name] or {}
@@ -71,6 +71,7 @@ local function AddData(db, name, class, level, elite, guild, npcinfo)
   units[db][name].elite = elite or units[db][name].elite
   units[db][name].guild = guild or units[db][name].guild
   units[db][name].npcinfo = npcinfo or units[db][name].npcinfo
+  units[db][name].pvp = pvp or units[db][name].pvp
   queue[name] = nil
 end
 
@@ -183,7 +184,8 @@ libunitscan:SetScript("OnEvent", function()
       level = UnitLevel(scan)
       name = UnitName(scan)
       guild = GetGuildInfo(scan)
-      AddData("players", name, class, level, nil, guild)
+      local pvp = UnitIsPVP(scan)
+      AddData("players", name, class, level, nil, guild, nil, pvp)
     else
       _, class = UnitClass(scan)
       elite = UnitClassification(scan)

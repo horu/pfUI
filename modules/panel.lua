@@ -625,7 +625,6 @@ pfUI:RegisterModule("panel", "vanilla:tbc", function()
 
 
   pfUI.panel.left = CreateFrame("Frame", "pfPanelLeft", UIParent)
-  pfUI.panel.left:SetFrameStrata("FULLSCREEN")
   pfUI.panel.left:ClearAllPoints()
 
   if pfUI.chat then
@@ -643,7 +642,6 @@ pfUI:RegisterModule("panel", "vanilla:tbc", function()
     pfUI.panel.left:SetWidth(C.chat.left.width)
   end
 
-  pfUI.panel.left:SetFrameStrata("DIALOG")
   pfUI.panel.left:SetHeight(C.global.font_size*1.5)
 
   CreateBackdrop(pfUI.panel.left, default_border, nil)
@@ -719,7 +717,6 @@ pfUI:RegisterModule("panel", "vanilla:tbc", function()
   end
 
   pfUI.panel.right = CreateFrame("Frame", "pfPanelRight", UIParent)
-  pfUI.panel.right:SetFrameStrata("FULLSCREEN")
   pfUI.panel.right:ClearAllPoints()
   if pfUI.chat then
     pfUI.panel.right:SetScale(pfUI.chat.right:GetScale())
@@ -736,7 +733,6 @@ pfUI:RegisterModule("panel", "vanilla:tbc", function()
     pfUI.panel.right:SetWidth(C.chat.right.width)
   end
 
-  pfUI.panel.right:SetFrameStrata("DIALOG")
   pfUI.panel.right:SetHeight(C.global.font_size*1.5)
 
   CreateBackdrop(pfUI.panel.right, default_border, nil)

@@ -343,6 +343,7 @@ pfUI_translation["ruRU"] = {
   ["Health - Auto"] = "Здоровье - автоматически",
   ["Healthbar"] = "Панель здоровья",
   ["Healthbar Animation Speed"] = "Скорость анимации панели здоровья",
+  ["Healthbar Count Limit On Screen"] = "Ограничение количества панелей здоровья на экране",
   ["Health Bar Color"] = "Цвет панели здоровья",
   ["Healthbar Embedded"] = "На панели здоровья",
   ["Healthbar Height"] = "Высота панели здоровья",

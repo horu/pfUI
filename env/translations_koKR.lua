@@ -343,6 +343,7 @@ pfUI_translation["koKR"] = {
   ["Health - Auto"] = "체력-자동",
   ["Healthbar"] = nil,
   ["Healthbar Animation Speed"] = "체력바 애니메이션 속도",
+  ["Healthbar Count Limit On Screen"] = nil,
   ["Health Bar Color"] = nil,
   ["Healthbar Embedded"] = "체력바에 겹쳐보기",
   ["Healthbar Height"] = "체력바 높이",

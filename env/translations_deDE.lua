@@ -454,6 +454,7 @@ pfUI_translation["deDE"] = {
   ["Map Group/Raid Circle Size"] = nil,
   ["Map Reveal Color"] = nil,
   ["Map Tooltip Scale"] = nil,
+  ["Mark Quest Creatures (require pfQuest)"] = nil,
   ["Max Amount Of Raid Frames"] = nil,
   ["Medium"] = nil,
   ["Memory Usage"] = nil,

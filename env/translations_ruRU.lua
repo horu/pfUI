@@ -454,6 +454,7 @@ pfUI_translation["ruRU"] = {
   ["Map Group/Raid Circle Size"] = "Размер кружков группы/рейда на карте",
   ["Map Reveal Color"] = "Цвет неисследованных областей на карте мира",
   ["Map Tooltip Scale"] = "Масштаб всплывающей подсказки на карте мира",
+  ["Mark Quest Creatures (require pfQuest)"] = "Помечать квестовых существ (требует pfQuest)",
   ["Max Amount Of Raid Frames"] = "Максимальное количество окон рейда",
   ["Medium"] = "Средне",
   ["Memory Usage"] = "Использование памяти",

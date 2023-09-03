@@ -23,6 +23,22 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
   -- cache default border color
   local er, eg, eb, ea = GetStringColor(pfUI_config.appearance.border.color)
 
+  local function IsQuestNpc(unitname)
+    if not pfMap or not pfMap.tooltips then
+      -- has no pfQuest api
+      return
+    end
+
+    local tooltip = pfMap.tooltips[unitname]
+    if not tooltip then
+      -- this is non quest unit
+      return
+    end
+
+    -- check unit's tooltip for titles
+    return next(tooltip) ~= nil
+  end
+
   local function IsPartyMember(unitname)
     if not UnitInParty("player") then
       return
@@ -361,6 +377,11 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     nameplate.pvpIcon.texture:SetVertexColor(1,1,1,1)
     nameplate.pvpIcon:Hide()
 
+    nameplate.questIcon = nameplate:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    nameplate.questIcon:SetPoint("LEFT", nameplate.name, "RIGHT", 0, 1)
+    nameplate.questIcon:SetText("|cff555555[|cffffcc00!|cff555555]|r")
+    nameplate.questIcon:Hide()
+
     do -- debuffs
       nameplate.debuffs = {}
       CreateDebuffIcon(nameplate, 1)
@@ -664,6 +685,12 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
       plate.pvpIcon:Show()
     else
       plate.pvpIcon:Hide()
+    end
+
+    if C.nameplates.markquests == "1" and IsQuestNpc(name) then
+      plate.questIcon:Show()
+    else
+      plate.questIcon:Hide()
     end
 
     plate.additionalinfo:SetPoint("BOTTOM", plate.name, "BOTTOM", 0, font_size + tonumber(C.nameplates.additionaloffset))

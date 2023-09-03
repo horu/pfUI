@@ -454,6 +454,7 @@ pfUI_translation["koKR"] = {
   ["Map Group/Raid Circle Size"] = nil,
   ["Map Reveal Color"] = nil,
   ["Map Tooltip Scale"] = nil,
+  ["Mark Quest Creatures (require pfQuest)"] = nil,
   ["Max Amount Of Raid Frames"] = nil,
   ["Medium"] = "평균",
   ["Memory Usage"] = "메모리 사용",

@@ -454,6 +454,7 @@ pfUI_translation["zhTW"] = {
   ["Map Group/Raid Circle Size"] = nil,
   ["Map Reveal Color"] = "未勘探地圖顏色",
   ["Map Tooltip Scale"] = nil,
+  ["Mark Quest Creatures (require pfQuest)"] = nil,
   ["Max Amount Of Raid Frames"] = nil,
   ["Medium"] = "中等速度",
   ["Memory Usage"] = "記憶體使用情況",

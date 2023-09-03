@@ -454,6 +454,7 @@ pfUI_translation["frFR"] = {
   ["Map Group/Raid Circle Size"] = nil,
   ["Map Reveal Color"] = "Couleur la carte révélée",
   ["Map Tooltip Scale"] = nil,
+  ["Mark Quest Creatures (require pfQuest)"] = nil,
   ["Max Amount Of Raid Frames"] = nil,
   ["Medium"] = "Moyen",
   ["Memory Usage"] = "Utilisation Mémoire",

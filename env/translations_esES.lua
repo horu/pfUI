@@ -454,6 +454,7 @@ pfUI_translation["esES"] = {
   ["Map Group/Raid Circle Size"] = "Tamaño del círculo en el mapa de los jugadores en grupo o banda",
   ["Map Reveal Color"] = "Color de revelación del mapa",
   ["Map Tooltip Scale"] = nil,
+  ["Mark Quest Creatures (require pfQuest)"] = nil,
   ["Max Amount Of Raid Frames"] = "Número máximo de marcos de banda",
   ["Medium"] = "Medio",
   ["Memory Usage"] = "Uso de memoria",

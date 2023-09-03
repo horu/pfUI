@@ -23,6 +23,22 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
   -- cache default border color
   local er, eg, eb, ea = GetStringColor(pfUI_config.appearance.border.color)
 
+  local function IsQuestNpc(unitname)
+    if not pfMap or not pfMap.tooltips then
+      -- has no pfQuest api
+      return
+    end
+
+    local tooltip = pfMap.tooltips[unitname]
+    if not tooltip then
+      -- this is non quest unit
+      return
+    end
+
+    -- check unit's tooltip for titles
+    return next(tooltip) ~= nil
+  end
+
   local function IsPartyMember(unitname)
     if not UnitInParty("player") then
       return
@@ -88,10 +104,11 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     end
   end
 
-  local function HidePlate(unittype, name, fullhp, target)
+  local function HidePlate(unittype, name, fullhp, target, isQuestNpc)
     -- keep some plates always visible according to config
     if C.nameplates.fullhealth == "1" and not fullhp then return nil end
     if C.nameplates.target == "1" and target then return nil end
+    if isQuestNpc then return nil end
 
     -- return true when something needs to be hidden
     if C.nameplates.enemynpc == "1" and unittype == "ENEMY_NPC" then
@@ -350,6 +367,11 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     nameplate.totem.icon:SetTexCoord(.078, .92, .079, .937)
     nameplate.totem.icon:SetAllPoints()
     CreateBackdrop(nameplate.totem)
+
+    nameplate.questIcon = nameplate:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    nameplate.questIcon:SetPoint("LEFT", nameplate.name, "RIGHT", 0, 1)
+    nameplate.questIcon:SetText("|cff555555[|cffffcc00!|cff555555]|r")
+    nameplate.questIcon:Hide()
 
     do -- debuffs
       nameplate.debuffs = {}
@@ -613,6 +635,8 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
       plate.health.backdrop:SetBackdropBorderColor(er,eg,eb,ea)
     end
 
+    local isQuestNpc = C.nameplates.markquests == "1" and IsQuestNpc(name) and unittype ~= "FRIENDLY_NPC"
+
     -- hide frames according to the configuration
     local TotemIcon = TotemPlate(name)
 
@@ -626,7 +650,7 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
       plate.health:Hide()
       plate.additionalinfo:Hide()
       plate.totem:Show()
-    elseif HidePlate(unittype, name, (hpmax-hp == hpmin), target) then
+    elseif HidePlate(unittype, name, (hpmax-hp == hpmin), target, isQuestNpc) then
       plate.level:SetPoint("RIGHT", plate.name, "LEFT", -3, 0)
       plate.name:SetParent(plate)
 
@@ -648,6 +672,12 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
       plate.health:Show()
       plate.glow:SetPoint("CENTER", plate.health, "CENTER", 0, 0)
       plate.totem:Hide()
+    end
+
+    if isQuestNpc then
+      plate.questIcon:Show()
+    else
+      plate.questIcon:Hide()
     end
 
     plate.additionalinfo:SetPoint("BOTTOM", plate.name, "BOTTOM", 0, font_size + tonumber(C.nameplates.additionaloffset))

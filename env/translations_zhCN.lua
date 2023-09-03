@@ -343,6 +343,7 @@ pfUI_translation["zhCN"] = {
   ["Health - Auto"] = "动态生命值和百分比",
   ["Healthbar"] = "生命条",
   ["Healthbar Animation Speed"] = "掉血动画速度",
+  ["Healthbar Count Limit On Screen"] = nil,
   ["Health Bar Color"] = nil,
   ["Healthbar Embedded"] = "血条上显示动态头像",
   ["Healthbar Height"] = "姓名板高度",

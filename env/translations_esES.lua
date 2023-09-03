@@ -343,6 +343,7 @@ pfUI_translation["esES"] = {
   ["Health - Auto"] = "Salud - Auto",
   ["Healthbar"] = "Barra de salud",
   ["Healthbar Animation Speed"] = "Velocidad de animación de la barra de salud",
+  ["Healthbar Count Limit On Screen"] = nil,
   ["Health Bar Color"] = "Color de la barra de salud",
   ["Healthbar Embedded"] = "Barra de salud embebida",
   ["Healthbar Height"] = "Altura de la barra de salud",

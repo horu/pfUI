@@ -343,6 +343,7 @@ pfUI_translation["frFR"] = {
   ["Health - Auto"] = "Points de vie - Automatique",
   ["Healthbar"] = "Barre des points de vie",
   ["Healthbar Animation Speed"] = "Vitesse de l'animation des barres de vie",
+  ["Healthbar Count Limit On Screen"] = nil,
   ["Health Bar Color"] = "Couleur de la barre des points de vie",
   ["Healthbar Embedded"] = "Barres de vies intégrées",
   ["Healthbar Height"] = "Hauteur des barres de vies",

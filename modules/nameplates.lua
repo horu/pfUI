@@ -15,10 +15,26 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
   local parentcount = 0
   local platecount = 0
   local registry = {}
+  local visibleCount = 0
+  local visibleOverheadTimeUp = nil
+  local visibleOverheadTimeDown = 0
   local debuffdurations = C.appearance.cd.debuffs == "1" and true or nil
 
   -- cache default border color
   local er, eg, eb, ea = GetStringColor(pfUI_config.appearance.border.color)
+
+  local function IsPartyMember(unitname)
+    if not UnitInParty("player") then
+      return
+    end
+
+    for i = 1, GetNumPartyMembers() do
+      local partyunit = "party" .. i
+      if UnitName(partyunit) == unitname then
+        return true
+      end
+    end
+  end
 
   local function GetUnitColor(unittype, unitname)
     local unitcolors = {
@@ -29,14 +45,9 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
       ["FRIENDLY_PLAYER"] = { .2, .6, 1, .8 }
     }
 
-    if unittype == "FRIENDLY_PLAYER" and UnitInParty("player") then
-      for i = 1, GetNumPartyMembers() do
-        partyunit = "party" .. i
-        if UnitName(partyunit) == unitname then
-          -- green color for party member
-          return { 0, .8, 0, .8 }
-        end
-      end
+    if unittype == "FRIENDLY_PLAYER" and IsPartyMember(unitname) then
+      -- green color for party member
+      return { 0, .8, 0, .8 }
     end
     return unitcolors[unittype]
   end
@@ -400,6 +411,7 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
 
     parent.nameplate = nameplate
     HookScript(parent, "OnShow", nameplates.OnShow)
+    HookScript(parent, "OnHide", nameplates.OnHide)
     HookScript(parent, "OnUpdate", nameplates.OnUpdate)
 
 
@@ -544,6 +556,27 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     elite = plate.original.levelicon:IsShown() and not player and "boss" or elite
     if not class then plate.wait_for_scan = true end
 
+    -- decrease alpha for players/enemy npc nameplates if too many of them
+    local alpha = 1
+    if (unittype == "FRIENDLY_PLAYER" or unittype == "ENEMY_NPC") and not IsPartyMember(name) and not target then
+      local limithealth = tonumber(C.nameplates.limithealth)
+      alpha = math.min(1, 1 - (visibleCount - limithealth) / limithealth)
+    end
+
+    if alpha <= 0 then
+      plate:Hide()
+    else
+      plate:Show()
+    end
+
+    -- set non-target plate alpha
+    if target or not UnitExists("target") then
+      plate:SetAlpha(alpha)
+    else
+      local notargalpha = math.min(tonumber(C.nameplates.notargalpha), alpha)
+      plate:SetAlpha(notargalpha)
+    end
+
     -- skip data updates on invisible frames
     if not visible then return end
 
@@ -560,8 +593,6 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
       hpmax = MobHealth_GetTargetMaxHP() > 0 and MobHealth_GetTargetMaxHP() or hpmax
     end
 
-    -- always make sure to keep plate visible
-    plate:Show()
 
     if target and C.nameplates.targetglow == "1" then
       plate.glow:Show() else plate.glow:Hide()
@@ -758,7 +789,13 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     local frame = frame or this
     local nameplate = frame.nameplate
 
+    visibleCount = visibleCount + 1
+
     nameplates:OnDataChanged(nameplate)
+  end
+
+  nameplates.OnHide = function(frame)
+    visibleCount = visibleCount - 1
   end
 
   nameplates.OnUpdate = function(frame)
@@ -778,14 +815,6 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
 
     -- cache target value
     nameplate.istarget = target
-
-    -- set non-target plate alpha
-    if target or not UnitExists("target") then
-      nameplate:SetAlpha(1)
-    else
-      frame:SetAlpha(.95)
-      nameplate:SetAlpha(tonumber(C.nameplates.notargalpha))
-    end
 
     -- use timer based updates
     if not nameplate.tick or nameplate.tick < GetTime() then

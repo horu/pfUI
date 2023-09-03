@@ -343,6 +343,7 @@ pfUI_translation["enUS"] = {
   ["Health - Auto"] = nil,
   ["Healthbar"] = nil,
   ["Healthbar Animation Speed"] = nil,
+  ["Healthbar Count Limit On Screen"] = nil,
   ["Health Bar Color"] = nil,
   ["Healthbar Embedded"] = nil,
   ["Healthbar Height"] = nil,

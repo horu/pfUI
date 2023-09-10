@@ -368,6 +368,21 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     nameplate.totem.icon:SetAllPoints()
     CreateBackdrop(nameplate.totem)
 
+    nameplate.pvpIcon = CreateFrame("Frame", nil, nameplate)
+    nameplate.pvpIcon.texture = nameplate.pvpIcon:CreateTexture(nil,"BACKGROUND")
+    nameplate.pvpIcon:SetWidth(14)
+    nameplate.pvpIcon:SetHeight(14)
+    nameplate.pvpIcon:SetPoint("LEFT", nameplate.name, "RIGHT", 0, -1)
+    nameplate.pvpIcon.texture:SetTexture(pfUI.media["img:pvp"])
+    nameplate.pvpIcon.texture:SetAllPoints(nameplate.pvpIcon)
+    nameplate.pvpIcon.texture:SetVertexColor(1,1,1,1)
+    nameplate.pvpIcon:Hide()
+
+    nameplate.hardcoreIcon = nameplate:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    nameplate.hardcoreIcon:SetPoint("LEFT", nameplate.name, "RIGHT", 0, 0)
+    nameplate.hardcoreIcon:SetText("|cff555555[|cffffcc00H|cff555555]|r")
+    nameplate.hardcoreIcon:Hide()
+
     nameplate.questIcon = nameplate:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     nameplate.questIcon:SetPoint("LEFT", nameplate.name, "RIGHT", 0, 1)
     nameplate.questIcon:SetText("|cff555555[|cffffcc00!|cff555555]|r")
@@ -541,7 +556,7 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
     local hpmin, hpmax = plate.original.healthbar:GetMinMaxValues()
     local name = plate.original.name:GetText()
     local level = plate.original.level:IsShown() and plate.original.level:GetObjectType() == "FontString" and tonumber(plate.original.level:GetText()) or "??"
-    local class, ulevel, elite, player, guild, npcinfo = GetUnitData(name, true)
+    local class, ulevel, elite, player, guild, npcinfo, playerinfo = GetUnitData(name, true)
     local target = plate.istarget
     local mouseover = UnitExists("mouseover") and plate.original.glow:IsShown() or nil
     local unitstr = target and "target" or mouseover and "mouseover" or nil
@@ -678,6 +693,20 @@ pfUI:RegisterModule("nameplates", "vanilla:tbc", function ()
       plate.questIcon:Show()
     else
       plate.questIcon:Hide()
+    end
+
+    if C.nameplates.showplayerinfo == "1" then
+      if playerinfo == "pvp" then
+        plate.pvpIcon:Show()
+      else
+        plate.pvpIcon:Hide()
+      end
+
+      if playerinfo == "Hardcore" then
+        plate.hardcoreIcon:Show()
+      else
+        plate.hardcoreIcon:Hide()
+      end
     end
 
     plate.additionalinfo:SetPoint("BOTTOM", plate.name, "BOTTOM", 0, font_size + tonumber(C.nameplates.additionaloffset))
